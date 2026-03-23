@@ -1,0 +1,28 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Ben Gurion Airport",
+        "description": "Create sensors for live Ben Gurion Airport arrivals and departures.",
+        "data": {
+          "name": "Name",
+          "refresh_minutes": "Refresh interval (minutes)",
+          "board_limit": "Flights to expose per board",
+          "include_completed": "Include departed, landed, and canceled flights"
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Ben Gurion Airport",
+        "data": {
+          "refresh_minutes": "Refresh interval (minutes)",
+          "board_limit": "Flights to expose per board",
+          "include_completed": "Include departed, landed, and canceled flights"
+        }
+      }
+    }
+  }
+}

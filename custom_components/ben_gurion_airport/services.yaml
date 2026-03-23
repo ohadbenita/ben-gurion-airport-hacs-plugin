@@ -1,0 +1,64 @@
+track_flight:
+  name: Track flight
+  description: Create or update a tracked-flight sensor for a specific flight code and date.
+  fields:
+    flight_code:
+      name: Flight code
+      description: Full flight code such as LY001 or LY1027.
+      required: true
+      example: LY001
+      selector:
+        text:
+    flight_date:
+      name: Flight date
+      description: Scheduled flight date in YYYY-MM-DD format.
+      required: true
+      example: "2026-03-24"
+      selector:
+        date:
+    direction:
+      name: Direction
+      description: Whether to track a departure or arrival.
+      required: false
+      default: departure
+      selector:
+        select:
+          options:
+            - departure
+            - arrival
+    name:
+      name: Name
+      description: Optional friendly name for the tracked sensor.
+      required: false
+      example: Family flight to Newark
+      selector:
+        text:
+
+untrack_flight:
+  name: Untrack flight
+  description: Stop tracking a previously configured flight.
+  fields:
+    flight_code:
+      name: Flight code
+      description: Full flight code such as LY001 or LY1027.
+      required: true
+      example: LY001
+      selector:
+        text:
+    flight_date:
+      name: Flight date
+      description: Scheduled flight date in YYYY-MM-DD format.
+      required: true
+      example: "2026-03-24"
+      selector:
+        date:
+    direction:
+      name: Direction
+      description: Whether the tracked flight is a departure or arrival.
+      required: false
+      default: departure
+      selector:
+        select:
+          options:
+            - departure
+            - arrival

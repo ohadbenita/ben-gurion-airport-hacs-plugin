@@ -1,0 +1,10 @@
+{
+  "domain": "ben_gurion_airport",
+  "name": "Ben Gurion Airport",
+  "config_flow": true,
+  "integration_type": "hub",
+  "iot_class": "cloud_polling",
+  "loggers": ["custom_components.ben_gurion_airport"],
+  "requirements": [],
+  "version": "0.1.0"
+}

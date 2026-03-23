@@ -1,0 +1,8 @@
+{
+  "name": "Ben Gurion Airport",
+  "content_in_root": false,
+  "country": "IL",
+  "domains": ["sensor"],
+  "homeassistant": "2024.6.0",
+  "render_readme": true
+}
