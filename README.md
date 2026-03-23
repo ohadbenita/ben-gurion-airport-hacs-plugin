@@ -2,6 +2,39 @@
 
 HACS custom integration for Ben Gurion Airport arrivals and departures using the official [data.gov.il](https://data.gov.il/he/datasets/airport_authority/flydata) feed.
 
+## Installation
+
+1. Add this repository as a custom repository in HACS.
+2. Install the integration.
+3. Restart Home Assistant.
+4. Go to `Settings -> Devices & Services -> Add Integration`.
+5. Search for `Ben Gurion Airport`.
+
+## Versioning and updates
+
+This integration already includes a version in [`manifest.json`](custom_components/ben_gurion_airport/manifest.json). For HACS users to see updates cleanly, each release should do two things:
+
+1. Bump the `version` field in `custom_components/ben_gurion_airport/manifest.json`
+2. Create a matching GitHub tag or GitHub release, for example `v0.1.1`
+
+Recommended release flow:
+
+```bash
+git checkout master
+git pull
+
+# edit custom_components/ben_gurion_airport/manifest.json
+# change "version": "0.1.0" -> "version": "0.1.1"
+
+git add custom_components/ben_gurion_airport/manifest.json README.md
+git commit -m "Release v0.1.1"
+git tag v0.1.1
+git push origin master
+git push origin v0.1.1
+```
+
+If you publish a GitHub Release for that tag as well, HACS will present the release more nicely to users when updating.
+
 ## Features
 
 - HACS-ready custom integration
@@ -147,90 +180,7 @@ The `next_flight` attribute and each item inside `flights` expose:
 
 Because the integration exposes both a summary count and full board rows, it works well with Home Assistant automations, template sensors, and dashboards.
 
-### 1. Notify when the next departure becomes delayed
-
-```yaml
-automation:
-  - alias: "Ben Gurion: next departure delayed"
-    trigger:
-      - platform: state
-        entity_id: sensor.ben_gurion_airport_departures_board
-    condition:
-      - condition: template
-        value_template: >
-          {{ state_attr('sensor.ben_gurion_airport_departures_board', 'next_flight') is mapping }}
-      - condition: template
-        value_template: >
-          {{ state_attr('sensor.ben_gurion_airport_departures_board', 'next_flight').is_delayed }}
-    action:
-      - service: notify.mobile_app_your_phone
-        data:
-          title: "Departure delay"
-          message: >
-            {{ state_attr('sensor.ben_gurion_airport_departures_board', 'next_flight').flight_code }}
-            to
-            {{ state_attr('sensor.ben_gurion_airport_departures_board', 'next_flight').city }}
-            is delayed.
-```
-
-### 2. Send a morning arrivals summary
-
-```yaml
-automation:
-  - alias: "Ben Gurion: morning arrivals summary"
-    trigger:
-      - platform: time
-        at: "07:00:00"
-    action:
-      - service: notify.mobile_app_your_phone
-        data:
-          title: "Ben Gurion arrivals"
-          message: >
-            There are {{ states('sensor.ben_gurion_airport_arrivals_board') }} arrivals on the board,
-            including {{ state_attr('sensor.ben_gurion_airport_arrivals_board', 'delayed_count') }} delayed flights.
-```
-
-### 3. Create a template sensor for the next departure destination
-
-```yaml
-template:
-  - sensor:
-      - name: "Ben Gurion Next Departure City"
-        state: >
-          {% set flight = state_attr('sensor.ben_gurion_airport_departures_board', 'next_flight') %}
-          {{ flight.city if flight else 'Unknown' }}
-```
-
-### 4. Alert when no data has refreshed recently
-
-```yaml
-automation:
-  - alias: "Ben Gurion: stale feed warning"
-    trigger:
-      - platform: template
-        value_template: >
-          {{
-            (as_timestamp(now()) - as_timestamp(states('sensor.ben_gurion_airport_last_update')))
-            > 1800
-          }}
-    action:
-      - service: notify.mobile_app_your_phone
-        data:
-          title: "Ben Gurion feed warning"
-          message: "The airport data feed has not refreshed in the last 30 minutes."
-```
-
-### 5. Build a Lovelace markdown card from the first few flights
-
-```yaml
-type: markdown
-content: >
-  {% for flight in state_attr('sensor.ben_gurion_airport_departures_board', 'flights')[:5] %}
-  - {{ flight.scheduled_time[11:16] }} | {{ flight.flight_code }} | {{ flight.city }} | {{ flight.status }}
-  {% endfor %}
-```
-
-### 6. Track a specific departure and notify on any change
+### 1. Track a specific departure and notify on any change
 
 First create the tracked flight:
 
@@ -263,7 +213,7 @@ automation:
             Gate: {{ state_attr('sensor.newark_flight', 'gate') or 'TBD' }}.
 ```
 
-### 7. Trigger only when any tracked-flight field changes
+### 2. Trigger only when any tracked-flight field changes
 
 If you want a dedicated change token, use the `change_token` attribute:
 
@@ -282,6 +232,89 @@ automation:
             changed in the airport feed.
 ```
 
+### 3. Notify when the next departure becomes delayed
+
+```yaml
+automation:
+  - alias: "Ben Gurion: next departure delayed"
+    trigger:
+      - platform: state
+        entity_id: sensor.ben_gurion_airport_departures_board
+    condition:
+      - condition: template
+        value_template: >
+          {{ state_attr('sensor.ben_gurion_airport_departures_board', 'next_flight') is mapping }}
+      - condition: template
+        value_template: >
+          {{ state_attr('sensor.ben_gurion_airport_departures_board', 'next_flight').is_delayed }}
+    action:
+      - service: notify.mobile_app_your_phone
+        data:
+          title: "Departure delay"
+          message: >
+            {{ state_attr('sensor.ben_gurion_airport_departures_board', 'next_flight').flight_code }}
+            to
+            {{ state_attr('sensor.ben_gurion_airport_departures_board', 'next_flight').city }}
+            is delayed.
+```
+
+### 4. Send a morning arrivals summary
+
+```yaml
+automation:
+  - alias: "Ben Gurion: morning arrivals summary"
+    trigger:
+      - platform: time
+        at: "07:00:00"
+    action:
+      - service: notify.mobile_app_your_phone
+        data:
+          title: "Ben Gurion arrivals"
+          message: >
+            There are {{ states('sensor.ben_gurion_airport_arrivals_board') }} arrivals on the board,
+            including {{ state_attr('sensor.ben_gurion_airport_arrivals_board', 'delayed_count') }} delayed flights.
+```
+
+### 5. Create a template sensor for the next departure destination
+
+```yaml
+template:
+  - sensor:
+      - name: "Ben Gurion Next Departure City"
+        state: >
+          {% set flight = state_attr('sensor.ben_gurion_airport_departures_board', 'next_flight') %}
+          {{ flight.city if flight else 'Unknown' }}
+```
+
+### 6. Alert when no data has refreshed recently
+
+```yaml
+automation:
+  - alias: "Ben Gurion: stale feed warning"
+    trigger:
+      - platform: template
+        value_template: >
+          {{
+            (as_timestamp(now()) - as_timestamp(states('sensor.ben_gurion_airport_last_update')))
+            > 1800
+          }}
+    action:
+      - service: notify.mobile_app_your_phone
+        data:
+          title: "Ben Gurion feed warning"
+          message: "The airport data feed has not refreshed in the last 30 minutes."
+```
+
+### 7. Build a Lovelace markdown card from the first few flights
+
+```yaml
+type: markdown
+content: >
+  {% for flight in state_attr('sensor.ben_gurion_airport_departures_board', 'flights')[:5] %}
+  - {{ flight.scheduled_time[11:16] }} | {{ flight.flight_code }} | {{ flight.city }} | {{ flight.status }}
+  {% endfor %}
+```
+
 ### Notes for automations
 
 - The board sensor state is a count, not a flight code or status.
@@ -289,14 +322,6 @@ automation:
 - Tracked-flight sensors are the best option when you want a dedicated entity for one specific flight on one specific date.
 - If you disable completed flights, landed, departed, and canceled rows will be filtered out before they reach Home Assistant.
 - The upstream dataset metadata says it updates every 15 minutes, even if you choose a shorter polling interval in Home Assistant.
-
-## Installation
-
-1. Add this repository as a custom repository in HACS.
-2. Install the integration.
-3. Restart Home Assistant.
-4. Go to `Settings -> Devices & Services -> Add Integration`.
-5. Search for `Ben Gurion Airport`.
 
 ## Data source
 

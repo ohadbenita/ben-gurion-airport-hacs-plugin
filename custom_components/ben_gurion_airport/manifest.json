@@ -1,9 +1,12 @@
 {
   "domain": "ben_gurion_airport",
   "name": "Ben Gurion Airport",
+  "codeowners": ["@ohadbenita"],
   "config_flow": true,
+  "documentation": "https://github.com/ohadbenita/ben-gurion-airport-hacs-plugin",
   "integration_type": "hub",
   "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/ohadbenita/ben-gurion-airport-hacs-plugin/issues",
   "loggers": ["custom_components.ben_gurion_airport"],
   "requirements": [],
   "version": "0.1.0"

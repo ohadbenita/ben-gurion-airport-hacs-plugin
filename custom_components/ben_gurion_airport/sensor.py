@@ -17,6 +17,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
+from homeassistant.util import dt as dt_util
 
 from .const import (
     COORDINATOR_KEY,
@@ -158,7 +159,7 @@ class BenGurionAirportSensor(
     def native_value(self) -> Any:
         """Return the sensor state."""
         if self.entity_description.board_key == "meta":
-            return self.coordinator.data["fetched_at"]
+            return dt_util.parse_datetime(self.coordinator.data["fetched_at"])
 
         return self.coordinator.data[self.entity_description.board_key]["count"]
 
