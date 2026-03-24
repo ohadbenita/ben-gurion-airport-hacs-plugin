@@ -10,31 +10,6 @@ HACS custom integration for Ben Gurion Airport arrivals and departures using the
 4. Go to `Settings -> Devices & Services -> Add Integration`.
 5. Search for `Ben Gurion Airport`.
 
-## Versioning and updates
-
-This integration already includes a version in [`manifest.json`](custom_components/ben_gurion_airport/manifest.json). For HACS users to see updates cleanly, each release should do two things:
-
-1. Bump the `version` field in `custom_components/ben_gurion_airport/manifest.json`
-2. Create a matching GitHub tag or GitHub release, for example `v0.1.1`
-
-Recommended release flow:
-
-```bash
-git checkout master
-git pull
-
-# edit custom_components/ben_gurion_airport/manifest.json
-# change "version": "0.1.0" -> "version": "0.1.1"
-
-git add custom_components/ben_gurion_airport/manifest.json README.md
-git commit -m "Release v0.1.1"
-git tag v0.1.1
-git push origin master
-git push origin v0.1.1
-```
-
-If you publish a GitHub Release for that tag as well, HACS will present the release more nicely to users when updating.
-
 ## Features
 
 - HACS-ready custom integration
