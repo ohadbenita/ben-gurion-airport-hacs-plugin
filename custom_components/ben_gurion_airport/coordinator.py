@@ -16,6 +16,7 @@ from .const import (
     CONF_BOARD_LIMIT,
     CONF_INCLUDE_COMPLETED,
     CONF_REFRESH_MINUTES,
+    DEFAULT_FETCH_LIMIT,
     DIRECTION_ARRIVAL,
     DIRECTION_DEPARTURE,
     DOMAIN,
@@ -71,10 +72,12 @@ class BenGurionAirportDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]
             departures = await self.api.async_fetch_flights(
                 direction=DIRECTION_DEPARTURE,
                 include_completed=True,
+                limit=DEFAULT_FETCH_LIMIT,
             )
             arrivals = await self.api.async_fetch_flights(
                 direction=DIRECTION_ARRIVAL,
                 include_completed=True,
+                limit=DEFAULT_FETCH_LIMIT,
             )
         except BenGurionAirportApiError as err:
             raise UpdateFailed(str(err)) from err
