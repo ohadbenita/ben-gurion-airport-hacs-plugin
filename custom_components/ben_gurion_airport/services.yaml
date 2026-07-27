@@ -1,3 +1,48 @@
+search_flights:
+  name: Search flights
+  description: Search the current airport feed and return flights that can be passed to the track flight action.
+  fields:
+    query:
+      name: Search
+      description: Flight code, airline, city, airport code, or country.
+      required: false
+      example: LY Newark
+      selector:
+        text:
+    flight_date:
+      name: Flight date
+      description: Optional scheduled flight date in YYYY-MM-DD format.
+      required: false
+      example: "2026-03-24"
+      selector:
+        date:
+    direction:
+      name: Direction
+      description: Optionally limit results to departures or arrivals.
+      required: false
+      selector:
+        select:
+          options:
+            - departure
+            - arrival
+    include_completed:
+      name: Include completed flights
+      description: Include departed, landed, and canceled flights.
+      required: false
+      default: true
+      selector:
+        boolean:
+    limit:
+      name: Result limit
+      description: Maximum number of flights to return.
+      required: false
+      default: 20
+      selector:
+        number:
+          min: 1
+          max: 50
+          mode: slider
+
 track_flight:
   name: Track flight
   description: Create or update a tracked-flight sensor for a specific flight code and date.
