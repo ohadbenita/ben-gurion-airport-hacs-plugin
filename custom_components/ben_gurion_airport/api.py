@@ -2,19 +2,21 @@
 
 from __future__ import annotations
 
+import asyncio
 from collections.abc import Mapping
 from dataclasses import dataclass
 import json
 import logging
 from typing import Any
 
-from aiohttp import ClientError
+from aiohttp import ClientError, ClientResponseError
 
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 from .const import API_URL, RESOURCE_ID, USER_AGENT
 
 _LOGGER = logging.getLogger(__name__)
+RETRYABLE_HTTP_STATUSES = {429, 500, 502, 503, 504}
 
 
 @dataclass(slots=True)
@@ -55,12 +57,46 @@ class BenGurionAirportApiClient:
 
         _LOGGER.debug("Fetching airport data with params=%s", params)
 
-        try:
-            async with session.get(API_URL, params=params, headers=headers, timeout=30) as response:
-                response.raise_for_status()
-                payload = await response.json()
-        except (TimeoutError, ClientError, ValueError) as err:
-            raise BenGurionAirportApiError(f"Failed to fetch airport data: {err}") from err
+        max_attempts = 3
+        payload: dict[str, Any] | None = None
+
+        for attempt in range(1, max_attempts + 1):
+            try:
+                async with session.get(API_URL, params=params, headers=headers, timeout=30) as response:
+                    response.raise_for_status()
+                    payload = await response.json()
+                    break
+            except ClientResponseError as err:
+                if attempt < max_attempts and err.status in RETRYABLE_HTTP_STATUSES:
+                    wait_seconds = 2 ** (attempt - 1)
+                    _LOGGER.warning(
+                        "Airport API request failed with status %s (attempt %s/%s), retrying in %ss",
+                        err.status,
+                        attempt,
+                        max_attempts,
+                        wait_seconds,
+                    )
+                    await asyncio.sleep(wait_seconds)
+                    continue
+                raise BenGurionAirportApiError(f"Failed to fetch airport data: {err}") from err
+            except (TimeoutError, ClientError) as err:
+                if attempt < max_attempts:
+                    wait_seconds = 2 ** (attempt - 1)
+                    _LOGGER.warning(
+                        "Airport API request failed due to network error (attempt %s/%s), retrying in %ss: %s",
+                        attempt,
+                        max_attempts,
+                        wait_seconds,
+                        err,
+                    )
+                    await asyncio.sleep(wait_seconds)
+                    continue
+                raise BenGurionAirportApiError(f"Failed to fetch airport data: {err}") from err
+            except ValueError as err:
+                raise BenGurionAirportApiError(f"Failed to fetch airport data: {err}") from err
+
+        if payload is None:
+            raise BenGurionAirportApiError("Failed to fetch airport data: no response payload")
 
         if not payload.get("success"):
             raise BenGurionAirportApiError(
