@@ -14,6 +14,7 @@ CONF_DIRECTION = "direction"
 CONF_FLIGHT_CODE = "flight_code"
 CONF_FLIGHT_DATE = "flight_date"
 CONF_INCLUDE_COMPLETED = "include_completed"
+CONF_QUERY = "query"
 CONF_REFRESH_MINUTES = "refresh_minutes"
 
 RESOURCE_ID = "e83f763b-b7d7-479e-b172-ae981ddc6de5"
@@ -34,6 +35,7 @@ TRACKED_FLIGHTS_STORE_VERSION = 1
 
 SERVICE_TRACK_FLIGHT = "track_flight"
 SERVICE_UNTRACK_FLIGHT = "untrack_flight"
+SERVICE_SEARCH_FLIGHTS = "search_flights"
 
 STATE_NOT_FOUND = "not_found"
 

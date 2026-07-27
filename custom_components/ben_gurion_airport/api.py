@@ -33,6 +33,7 @@ class BenGurionAirportApiClient:
         direction: str | None = None,
         include_completed: bool = False,
         limit: int = 200,
+        query: str | None = None,
     ) -> list[dict[str, Any]]:
         """Fetch flights from the airport feed."""
         params: dict[str, Any] = {
@@ -40,6 +41,8 @@ class BenGurionAirportApiClient:
             "limit": limit,
             "sort": "CHSTOL asc",
         }
+        if query:
+            params["q"] = query
 
         filters: dict[str, Any] = {}
         if direction:
@@ -62,6 +65,8 @@ class BenGurionAirportApiClient:
                 "limit": limit * 2,
                 "sort": "CHSTOL asc",
             }
+            if query:
+                fallback_params["q"] = query
             _LOGGER.warning(
                 "Filtered airport data request failed; retrying without API filters"
             )
